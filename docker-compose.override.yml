@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  dccn.calendar.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080:80"
+    volumes:
+      - $APPDATA/Microsoft/UserSecrets/:/root/.microsoft/usersecrets/
