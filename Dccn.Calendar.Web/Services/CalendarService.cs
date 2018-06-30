@@ -42,7 +42,13 @@ namespace Dccn.Calendar.Web.Services
             {
                 client.MaxEvents = _options.MaxEvents.Value;
             }
+
             var calendar = await client.GetCalendarByIdAsync(calendarOptions.ExchangeId);
+            if (calendarOptions.Name != null)
+            {
+                calendar.Name = calendarOptions.Name;
+            }
+
             _calendarCache.Add(calendarId, calendar);
             return (true, calendar);
         }

@@ -24,12 +24,13 @@ namespace Dccn.Calendar
         {
             _folder = folder;
             Client = client;
+            Name = _folder.DisplayName;
         }
 
         public CalendarClient Client { get; }
 
         public string Id => _folder.Id.ToString();
-        public string Name => _folder.DisplayName;
+        public string Name { get; set; }
 
         public async Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, DateTime end)
         {
