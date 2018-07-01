@@ -10,5 +10,6 @@ namespace Dccn.Calendar.Web.Models
         public DateTime End { get; set; }
         public bool AllDay { get; set; }
         public bool Recurring { get; set; }
+        public string Location { get; set; }
     }
 }

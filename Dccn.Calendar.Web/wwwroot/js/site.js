@@ -29,19 +29,30 @@ jQuery(function($) {
                 return event;
             },
             eventRender: function(event, $elem) {
-                var text;
+                var html = "<div>";
                 if (event.allDay) {
-                    text = event.start.format("L") + " - " + event.end.format("L");
+                    if (event.end.diff(event.start, "days") <= 1) {
+                        html += event.start.format("L");
+                    } else {
+                        var newEnd = moment(event.end);
+                        newEnd.subtract(1, "days");
+                        html += event.start.format("L") + " - " + newEnd.format("L");
+                    }
                 } else {
-                    text = event.start.format("LT") + " - " + event.end.format("LT");
+                    html += event.start.format("LT") + " - " + event.end.format("LT");
                 }
                 if (event.recurring) {
-                    text += " (recurring)";
+                    html += " <i>(recurring)</i>";
                 }
+                html += "<br/>";
+                if (event.location) {
+                    html += "<b>Location:</b> " + event.location;
+                }
+                html += "</div>";
                 $elem.qtip({
                     content: {
                         title: event.title,
-                        text: text
+                        text: $(html)
                     },
                     style: {
                         classes: "qtip-dark qtip-rounded"

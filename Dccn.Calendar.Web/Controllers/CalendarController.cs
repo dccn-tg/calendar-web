@@ -24,13 +24,13 @@ namespace Dccn.Calendar.Web.Controllers
         [ProducesResponseType(typeof(IEnumerable<EventDto>), 200)]
         public async Task<IActionResult> EventsAsync([FromQuery(Name = "id")] string calendarId, DateTime start, DateTime end)
         {
-            var result = await _service.TryGetCalendarAsync(calendarId);
-            if (!result.Success)
+            var (success, calendar) = await _service.TryGetCalendarAsync(calendarId);
+            if (!success)
             {
                 return NotFound();
             }
 
-            var events = (await result.Calendar.EventsRangeAsync(start, end))
+            var events = (await calendar.EventsRangeAsync(start, end))
                 .Select(@event => new EventDto
                 {
                     Id = @event.Id,
@@ -38,7 +38,8 @@ namespace Dccn.Calendar.Web.Controllers
                     Start = @event.Start,
                     End = @event.End,
                     AllDay = @event.AllDay,
-                    Recurring = @event.Recurring
+                    Recurring = @event.Recurring,
+                    Location = calendar.Name
                 });
 
             return Ok(events);
