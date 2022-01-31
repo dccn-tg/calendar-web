@@ -2,7 +2,7 @@
 
 namespace Dccn.Calendar.Web.Models
 {
-    public class EventDto
+    public class CalendarEvent
     {
         public string Id { get; set; }
         public string Title { get; set; }

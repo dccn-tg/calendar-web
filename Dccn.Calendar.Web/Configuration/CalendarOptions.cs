@@ -19,8 +19,10 @@ namespace Dccn.Calendar.Web.Configuration
         public class Calendar
         {
             public string Name { get; set; }
+            public string Location { get; set; }
             public string Source { get; set; }
             public string ExchangeId { get; set; }
+            public bool ShowInTodayOverview { get; set; } = false;
         }
     }
 }

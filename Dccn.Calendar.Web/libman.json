@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "provider": "cdnjs",
+      "library": "jquery@3.3.1",
+      "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-loading-overlay@2.1.6",
+      "destination": "wwwroot/lib/jquery-loading-overlay/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "fullcalendar@3.9.0",
+      "destination": "wwwroot/lib/fullcalendar/"
+    },
+    {
+      "library": "qtip2@3.0.3",
+      "destination": "wwwroot/lib/qtip2/"
+    },
+    {
+      "library": "normalize@8.0.1",
+      "destination": "wwwroot/lib/normalize/"
+    },
+    {
+      "library": "moment.js@2.22.2",
+      "destination": "wwwroot/lib/moment.js/"
+    }
+  ]
+}

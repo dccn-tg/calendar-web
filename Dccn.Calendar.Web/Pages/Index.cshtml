@@ -1,0 +1,28 @@
+﻿@page
+@model IndexModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Calendars</title>
+</head>
+<body>
+<h2>Calendars</h2>
+<ul>
+    @foreach (var calendar in Model.Calendars)
+    {
+        <li>
+            @if (calendar.IsValid)
+            {
+                <a href="@Url.Page("Calendar", new { calendar.Id })">@calendar.Name</a>
+            }
+            else
+            {
+                <span style="color: red; text-decoration: line-through;">@calendar.Name (missing!)</span>
+            }
+        </li>
+    }
+</ul>
+</body>
+</html>

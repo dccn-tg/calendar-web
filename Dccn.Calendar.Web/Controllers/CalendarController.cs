@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dccn.Calendar.Web.Controllers
 {
-    [Route("api/calendar")]
     [ApiController]
+    [Route("api/[action]")]
     public class CalendarController : ControllerBase
     {
         private readonly ICalendarService _service;
@@ -20,9 +20,12 @@ namespace Dccn.Calendar.Web.Controllers
         }
 
         [HttpGet]
-        [ActionName("events")]
-        [ProducesResponseType(typeof(IEnumerable<EventDto>), 200)]
-        public async Task<IActionResult> EventsAsync([FromQuery(Name = "id")] string calendarId, DateTime start, DateTime end)
+        [ActionName("Events")]
+        [ProducesResponseType(200), ProducesResponseType(404)]
+        public async Task<ActionResult<IEnumerable<CalendarEvent>>> EventsAsync(
+            [FromQuery(Name = "id")] string calendarId,
+            DateTime start,
+            DateTime end)
         {
             var (success, calendar) = await _service.TryGetCalendarAsync(calendarId);
             if (!success)
@@ -31,15 +34,15 @@ namespace Dccn.Calendar.Web.Controllers
             }
 
             var events = (await calendar.EventsRangeAsync(start, end))
-                .Select(@event => new EventDto
+                .Select(@event => new CalendarEvent
                 {
                     Id = @event.Id,
-                    Title = @event.Subject,
+                    Title = @event.Title,
                     Start = @event.Start,
                     End = @event.End,
                     AllDay = @event.AllDay,
                     Recurring = @event.Recurring,
-                    Location = calendar.Name
+                    Location = calendar.Location
                 });
 
             return Ok(events);

@@ -15,7 +15,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dccn.Calendar.Web", "Dccn.C
 		{B3E274BB-4405-4345-AAF8-CE26256379D1} = {B3E274BB-4405-4345-AAF8-CE26256379D1}
 	EndProjectSection
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{12A382F2-011D-4512-8B61-7E624CB55201}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D91E32B4-2324-4925-A351-4751B24C0187}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		docker-compose.override.yml = docker-compose.override.yml
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +42,6 @@ Global
 		{8596D75E-5E5C-4ECA-A7C1-09679E948E9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8596D75E-5E5C-4ECA-A7C1-09679E948E9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8596D75E-5E5C-4ECA-A7C1-09679E948E9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12A382F2-011D-4512-8B61-7E624CB55201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12A382F2-011D-4512-8B61-7E624CB55201}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12A382F2-011D-4512-8B61-7E624CB55201}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12A382F2-011D-4512-8B61-7E624CB55201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

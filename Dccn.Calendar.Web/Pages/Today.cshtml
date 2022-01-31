@@ -1,0 +1,48 @@
+﻿@page
+@model TodayModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Today's DCCN events</title>
+
+    <link type="text/css" rel="stylesheet" href="~/lib/normalize/css/normalize.css">
+    <environment include="Development">
+        <link type="text/css" rel="stylesheet" href="~/css/today.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link type="text/css" rel="stylesheet" href="~/css/today.min.css">
+    </environment>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th id="title" colspan="3">DCCN EVENTS OF TODAY</th>
+            </tr>
+            <tr>
+                <th id="date" colspan="3">@Html.DisplayFor(m => m.Date)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Events.Any())
+            {
+                 foreach (var @event in Model.Events)
+                 {
+                     <tr class="@(@event.Ended ? "event-ended" : null)">
+                         <td>@Html.DisplayFor(_ => @event.Start) - @Html.DisplayFor(_ => @event.End)</td>
+                         <td>@Html.DisplayFor(_ => @event.Title)</td>
+                         <td>@Html.DisplayFor(_ => @event.Location)</td>
+                     </tr>
+                 }
+            }
+            else
+            {
+                <tr>
+                    <td id="no-events" colspan="3">No events registered today</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

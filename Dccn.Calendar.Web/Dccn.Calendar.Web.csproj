@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>74e71062-ae95-42ae-8b93-5400e7fb9887</UserSecretsId>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerTargetOS>Linux</DockerTargetOS>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
+    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" PrivateAssets="all" />
+    <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="1.0.172" PrivateAssets="all" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dccn.Calendar\Dccn.Calendar.csproj" />
   </ItemGroup>
-
 </Project>

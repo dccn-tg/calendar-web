@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Dccn.Calendar.Web.Services;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Dccn.Calendar.Web.Pages
 {
+    [UsedImplicitly]
     public class CalendarModel : PageModel
     {
         private readonly ICalendarService _service;
@@ -14,19 +16,19 @@ namespace Dccn.Calendar.Web.Pages
             _service = service;
         }
 
-        public string CalendarId { get; private set; }
-        public string CalendarName { get; private set; }
+        public string Id { get; private set; }
+        public string Name { get; private set; }
 
-        public async Task<IActionResult> OnGetAsync(string calendarId)
+        public async Task<IActionResult> OnGetAsync(string id)
         {
-            var result = await _service.TryGetCalendarAsync(calendarId);
+            var result = await _service.TryGetCalendarAsync(id);
             if (!result.Success)
             {
                 return NotFound();
             }
 
-            CalendarId = calendarId;
-            CalendarName = result.Calendar.Name;
+            Id = id;
+            Name = result.Calendar.Name;
 
             return Page();
         }

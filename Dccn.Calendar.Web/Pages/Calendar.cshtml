@@ -1,50 +1,52 @@
-﻿@page "{*calendarId}"
+﻿@page "{**id}"
 @model CalendarModel
 
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width"/>
-    <title>@Model.CalendarName</title>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(m => m.Name)</title>
 
     <environment include="Development">
-        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/css/fullcalendar.css">
-        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/css/fullcalendar.print.css" media="print">
-        <link type="text/css" rel="stylesheet" href="~/lib/jquery-qtip/css/jquery.qtip.css">
-        <link type="text/css" rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+        <link type="text/css" rel="stylesheet" href="~/lib/normalize/normalize.css">
+        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/fullcalendar.css">
+        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/fullcalendar.print.css" media="print">
+        <link type="text/css" rel="stylesheet" href="~/lib/qtip2/jquery.qtip.css">
+        <link type="text/css" rel="stylesheet" href="~/css/calendar.css" asp-append-version="true">
     </environment>
     <environment exclude="Development">
-        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/css/fullcalendar.min.css">
-        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/css/fullcalendar.print.min.css" media="print">
-        <link type="text/css" rel="stylesheet" href="~/lib/jquery-qtip/css/jquery.qtip.min.css">
-        <link type="text/css" rel="stylesheet" href="~/css/site.min.css">
+        <link type="text/css" rel="stylesheet" href="~/lib/normalize/normalize.min.css">
+        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/fullcalendar.min.css">
+        <link type="text/css" rel="stylesheet" href="~/lib/fullcalendar/fullcalendar.print.min.css" media="print">
+        <link type="text/css" rel="stylesheet" href="~/lib/qtip2/jquery.qtip.min.css">
+        <link type="text/css" rel="stylesheet" href="~/css/calendar.min.css">
     </environment>
 </head>
 <body>
 
+<h1 class="title">@Html.DisplayFor(m => m.Name)</h1>
+<div class="calendar" data-calendar-api-url="@Url.Action("Events", "Calendar", new {id = Model.Id})"></div>
 <noscript>
     This page requires JavaScript to be enabled in order to function properly.
 </noscript>
 
-<div class="calendar" data-calendar-api-url="@Url.Action("events", "calendar", new {id = Model.CalendarId})"></div>
-
 <environment include="Development">
-    <script type="text/javascript" src="~/lib/jquery/js/jquery.js"></script>
-    <script type="text/javascript" src="~/lib/jquery-qtip/js/jquery.qtip.js"></script>
-    <script type="text/javascript" src="~/lib/jquery-loading-overlay/js/loadingoverlay.js"></script>
-    <script type="text/javascript" src="~/lib/moment/js/moment.js"></script>
-    <script type="text/javascript" src="~/lib/fullcalendar/js/fullcalendar.js"></script>
-    <script type="text/javascript" src="~/lib/fullcalendar/js/locale-all.js"></script>
-    <script type="text/javascript" src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="~/lib/qtip2/jquery.qtip.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-loading-overlay/loadingoverlay.js"></script>
+    <script type="text/javascript" src="~/lib/moment.js/moment.js"></script>
+    <script type="text/javascript" src="~/lib/fullcalendar/fullcalendar.js"></script>
+    <script type="text/javascript" src="~/lib/fullcalendar/locale-all.js"></script>
+    <script type="text/javascript" src="~/js/calendar.js" asp-append-version="true"></script>
 </environment>
 <environment exclude="Development">
-    <script type="text/javascript" src="~/lib/jquery/js/jquery.min.js"></script>
-    <script type="text/javascript" src="~/lib/jquery-qtip/js/jquery.qtip.min.js"></script>
-    <script type="text/javascript" src="~/lib/jquery-loading-overlay/js/loadingoverlay.min.js"></script>
-    <script type="text/javascript" src="~/lib/moment/js/moment.min.js"></script>
-    <script type="text/javascript" src="~/lib/fullcalendar/js/fullcalendar.min.js"></script>
-    <script type="text/javascript" src="~/lib/fullcalendar/js/locale-all.js"></script>
-    <script type="text/javascript" src="~/js/site.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="~/lib/qtip2/jquery.qtip.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-loading-overlay/loadingoverlay.min.js"></script>
+    <script type="text/javascript" src="~/lib/moment.js/moment.min.js"></script>
+    <script type="text/javascript" src="~/lib/fullcalendar/fullcalendar.min.js"></script>
+    <script type="text/javascript" src="~/lib/fullcalendar/locale-all.js"></script>
+    <script type="text/javascript" src="~/js/calendar.min.js"></script>
 </environment>
 
 </body>

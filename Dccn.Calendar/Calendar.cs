@@ -24,13 +24,12 @@ namespace Dccn.Calendar
         {
             _folder = folder;
             Client = client;
-            Name = _folder.DisplayName;
         }
 
         public CalendarClient Client { get; }
 
         public string Id => _folder.Id.ToString();
-        public string Name { get; set; }
+        public string Name => _folder.DisplayName;
 
         public async Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, DateTime end)
         {
@@ -42,7 +41,7 @@ namespace Dccn.Calendar
 
             return appointments
                 .OrderBy(appointment => appointment.Start)
-                .Select(appointment => new Event(appointment));
+                .Select(appointment => new Event(this, appointment));
         }
 
         public Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, TimeSpan duration)

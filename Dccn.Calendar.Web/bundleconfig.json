@@ -1,14 +1,20 @@
 ﻿[
   {
-    "outputFileName": "wwwroot/css/site.min.css",
+    "outputFileName": "wwwroot/css/calendar.min.css",
     "inputFiles": [
-      "wwwroot/css/site.css"
+      "wwwroot/css/calendar.css"
     ]
   },
   {
-    "outputFileName": "wwwroot/js/site.min.js",
+    "outputFileName": "wwwroot/css/today.min.css",
     "inputFiles": [
-      "wwwroot/js/site.js"
+      "wwwroot/css/today.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/calendar.min.js",
+    "inputFiles": [
+      "wwwroot/js/calendar.js"
     ],
     "minify": {
       "enabled": true,

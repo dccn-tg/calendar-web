@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Dccn.Calendar.Cli
 {
+    [UsedImplicitly(ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class CalendarOptions
     {
         public Uri ExchangeUrl { get; set; }
@@ -10,10 +12,7 @@ namespace Dccn.Calendar.Cli
         public string Username { get; set; }
         public string Password { get; set; }
 
-        public int? MaxEvents { get; set; }
-
-        public string OutputPath { get; set; }
-
-        public IDictionary<string, string> Calendars { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public string Source { get; set; }
+        public string Filter { get; set; }
     }
 }

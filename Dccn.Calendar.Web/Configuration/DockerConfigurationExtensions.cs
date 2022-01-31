@@ -1,15 +1,16 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 
 namespace Dccn.Calendar.Web.Configuration
 {
     public static class DockerConfigurationExtensions
     {
-        public static IConfigurationBuilder AddDockerSecrets(this IConfigurationBuilder builder)
+        public static IConfigurationBuilder AddDockerSecrets(this IConfigurationBuilder builder, string fileName = "secrets.json")
         {
             if (IsRunningInContainer())
             {
-                builder.AddJsonFile("/run/secrets/secrets.json", true);
+                builder.AddJsonFile(Path.Combine("/run/secrets", fileName), true);
             }
 
             return builder;
@@ -18,7 +19,7 @@ namespace Dccn.Calendar.Web.Configuration
         private static bool IsRunningInContainer()
         {
             var value = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER");
-            return !string.Equals(value, "0") || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+            return value != null && (value == "1" || value == "true");
         }
     }
 }

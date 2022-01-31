@@ -16,7 +16,7 @@ jQuery(function($) {
             navLinks: true,
             eventLimit: true,
             timezone: "local",
-            weekends: false,
+            weekends: true,
             eventColor: "#BE311A",
             eventTextColor: "white",
             eventSources: [
@@ -29,6 +29,7 @@ jQuery(function($) {
                 return event;
             },
             eventRender: function(event, $elem) {
+                var div = "<div></div>";
                 var html = "<div>";
                 if (event.allDay) {
                     if (event.end.diff(event.start, "days") <= 1) {
@@ -44,9 +45,8 @@ jQuery(function($) {
                 if (event.recurring) {
                     html += " <i>(recurring)</i>";
                 }
-                html += "<br/>";
                 if (event.location) {
-                    html += "<b>Location:</b> " + event.location;
+                    html += "<br/><b>Location:</b> " + event.location;
                 }
                 html += "</div>";
                 $elem.qtip({

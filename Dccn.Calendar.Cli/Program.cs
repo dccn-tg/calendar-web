@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Dccn.Calendar.Cli
 {
+    [UsedImplicitly]
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            MainAsync(args).GetAwaiter().GetResult();
-        }
-
-        public static async Task MainAsync(string[] args)
+        public static async Task Main(string[] args)
         {
             var options = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -22,44 +23,54 @@ namespace Dccn.Calendar.Cli
                 .Build()
                 .Get<CalendarOptions>();
 
-            var outputPath = options.OutputPath;
-
             var client = new CalendarClient(options.ExchangeUrl, options.Username, options.Password);
-            if (options.MaxEvents.HasValue)
+            var calendars = (await client.ListCalendarsAsync()).OrderBy(c => c.Name).ToList();
+            using (var writer = new JsonTextWriter(Console.Out))
             {
-                client.MaxEvents = options.MaxEvents.Value;
-            };
+                writer.Formatting = Formatting.Indented;
+                writer.Indentation = 2;
 
-            var today = DateTime.Today;
-            var period = TimeSpan.FromDays(1);
-
-            using (var writer = outputPath == null ? Console.Out : new StreamWriter(outputPath))
-            {
-                foreach (var entry in options.Calendars)
+                await writer.WriteStartObjectAsync();
+                foreach (var calendar in calendars)
                 {
-                    var calendarKey = entry.Key;
-                    var calendarId = entry.Value;
-
-                    var (success, calendar) = await client.TryGetCalendarByIdAsync(calendarId);
-                    if (!success)
+                    if (!string.IsNullOrWhiteSpace(options.Filter) && !calendar.Name.Contains(options.Filter, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        Console.Error.WriteLine($"Warning: Could not find calendar for {calendarKey}. Skipped.");
                         continue;
                     }
 
-                    Console.Error.WriteLine($"Retrieving events for '{calendar.Name}' ({calendarKey}).");
-                    var events = await calendar.EventsRangeAsync(today, period);
+                    await writer.WritePropertyNameAsync(Regex.Replace(calendar.Name, "\\W+", "_").Trim('_'));
 
-                    foreach (var @event in events)
+                    await writer.WriteStartObjectAsync();
+
+                    await writer.WritePropertyNameAsync("Name");
+                    await writer.WriteValueAsync(calendar.Name);
+
+                    await writer.WritePropertyNameAsync("Location");
+                    await writer.WriteNullAsync();
+
+                    await writer.WritePropertyNameAsync("Source");
+                    if (options.Source != null)
                     {
-                        writer.WriteLine("{0} {1} {2} {3}",
-                            @event.UnixTimestamp,
-                            calendarKey,
-                            @event.DurationMillis,
-                            @event.Subject);
+                        await writer.WriteValueAsync(options.Source);
                     }
+                    else
+                    {
+                        await writer.WriteNullAsync();
+                    }
+
+                    await writer.WritePropertyNameAsync("ExchangeId");
+                    await writer.WriteValueAsync(calendar.Id);
+
+                    await writer.WritePropertyNameAsync("ShowInTodayOverview");
+                    await writer.WriteValueAsync(false);
+
+                    await writer.WriteEndObjectAsync();
                 }
+
+                await writer.WriteEndObjectAsync();
             }
+
+            Console.ReadLine();
         }
     }
 }

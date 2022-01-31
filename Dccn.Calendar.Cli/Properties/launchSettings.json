@@ -2,6 +2,7 @@
   "profiles": {
     "Dccn.Calendar.Cli": {
       "commandName": "Project",
+      "commandLineArgs": "--list=true",
       "workingDirectory": "$(ProjectDir)"
     }
   }

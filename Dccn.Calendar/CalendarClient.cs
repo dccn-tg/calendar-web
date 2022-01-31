@@ -16,7 +16,7 @@ namespace Dccn.Calendar
 
         public CalendarClient(Uri exchangeUrl, string username, string password)
         {
-            _service = new ExchangeService(ExchangeVersion.Exchange2013)
+            _service = new ExchangeService(ExchangeVersion.Exchange2010_SP2)
             {
                 Credentials = new WebCredentials(username, password),
                 Url = exchangeUrl
@@ -35,13 +35,21 @@ namespace Dccn.Calendar
 
             var folders = await _service.FindFolders(WellKnownFolderName.Root, view);
             return folders
-                .Where(folder => folder is CalendarFolder)
-                .Select(folder => new Calendar(this, (CalendarFolder) folder));
+                .Select(folder => folder as CalendarFolder)
+                .Where(folder => folder != null)
+                .Select(folder => new Calendar(this, folder));
         }
 
         public async Task<Calendar> GetCalendarByIdAsync(string id)
         {
-            return new Calendar(this, await CalendarFolder.Bind(_service, new FolderId(id), FolderProperties));
+            try
+            {
+                return new Calendar(this, await CalendarFolder.Bind(_service, new FolderId(id), FolderProperties));
+            }
+            catch (ServiceResponseException e) when (e.ErrorCode == ServiceError.ErrorItemNotFound)
+            {
+                return null;
+            }
         }
 
         public async Task<(bool Success, Calendar Calendar)> TryGetCalendarByIdAsync(string id)

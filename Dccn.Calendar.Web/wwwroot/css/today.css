@@ -1,0 +1,72 @@
+﻿body {
+    background-color: black;
+    font-family: Verdana, Arial, Sans-Serif;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th {
+    text-align: center;
+    width: 1900px;
+}
+
+td {
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+
+tbody {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+tbody tr {
+    height: 60px;
+}
+
+tbody tr:nth-of-type(odd) {
+    background-color: #FCF6CF;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #FEFEF2;
+}
+
+tbody td:nth-of-type(1) {
+    width: 15%;
+    text-align: center;
+    color: #990000;
+}
+
+tbody td:nth-of-type(3) {
+    width: 30%;
+    text-align: left;
+    color: #990000;
+}
+
+tbody .event-ended td {
+    color: gray;
+}
+
+#title {
+    color: white;
+    font-size: 3rem;
+    font-weight: normal;
+    height: 80px;
+}
+
+#date {
+    color: #990000;
+    background-color: #FEFEF2;
+    font-size: 1.5rem;
+    height: 55px;
+}
+
+#no-events {
+    color: black;
+    background-color: #FEFEF2;
+    font-size: 1.5rem;
+}
