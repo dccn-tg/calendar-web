@@ -7,29 +7,58 @@ namespace Dccn.Calendar.Web.Services
 {
     public class Calendar
     {
-        private readonly Dccn.Calendar.Calendar _calendar;
-
         public Calendar(Dccn.Calendar.Calendar calendar)
         {
-            _calendar = calendar;
-            Id = _calendar?.Id;
+            Inner = calendar;
+            Id = Inner?.Id;
             Name = calendar?.Name;
             IsValid = calendar != null;
         }
+
+        public Dccn.Calendar.Calendar Inner { get; }
 
         public bool IsValid { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
+        public string OverrideEventTitle { get; set; }
+        public string MailBox => Inner.MailBox;
 
-        public Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, DateTime end)
+        public async Task<IEnumerable<Event>> EventsRangeAsync(CalendarClient client, DateTime start, DateTime end)
         {
-            return _calendar.EventsRangeAsync(start, end);
+            return (await Inner.EventsRangeAsync(client, MailBox, start, end))
+                .Select(@event => new Event(@event, this));
 ;       }
 
-        public Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, TimeSpan duration)
+        public async Task<IEnumerable<Event>> EventsRangeAsync(CalendarClient client, DateTime start, TimeSpan duration)
         {
-            return _calendar.EventsRangeAsync(start, duration);
+            return (await Inner.EventsRangeAsync(client, MailBox, start, duration))
+                .Select(@event => new Event(@event, this));
+        }
+
+        public class Event
+        {
+            public Event(Dccn.Calendar.Event @event, Calendar calendar)
+            {
+                Calendar = calendar;
+                Inner = @event;
+            }
+
+            public Dccn.Calendar.Event Inner { get; }
+
+            public string Id => Inner.Id;
+
+            public Calendar Calendar { get; }
+
+            public string Title => Calendar.OverrideEventTitle ?? Inner.Title;
+
+            public DateTime Start => Inner.Start;
+            public DateTime End => Inner.End;
+
+            public bool AllDay => Inner.AllDay;
+            public bool Recurring => Inner.Recurring;
+
+            public bool IsHidden => Inner.IsHidden;
         }
     }
 }

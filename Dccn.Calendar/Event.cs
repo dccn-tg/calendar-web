@@ -1,42 +1,42 @@
 ﻿using System;
-using Microsoft.Exchange.WebServices.Data;
+using Microsoft.Graph.Models;
 
 namespace Dccn.Calendar
 {
     public class Event
     {
-        private readonly Appointment _appointment;
+        private readonly Microsoft.Graph.Models.Event _event;
         private readonly string _originalTitle;
 
-        internal Event(Calendar calendar, Appointment appointment)
+        internal Event(Microsoft.Graph.Models.Event @event, Calendar calendar)
         {
-            _appointment = appointment;
+            _event = @event;
             Calendar = calendar;
 
-            if (appointment.Subject == null)
+            if (@event.Subject == null)
             {
                 _originalTitle = "???";
             }
-            else if (appointment.Subject.StartsWith("##"))
+            else if (@event.Subject.StartsWith("##"))
             {
-                _originalTitle = appointment.Subject.Remove(0, 2);
+                _originalTitle = @event.Subject.Remove(0, 2);
             }
         }
 
         public Calendar Calendar { get; }
 
-        public string Id => _appointment.ICalUid;
+        public string Id => _event.Id;
 
-        public string Title => _originalTitle ?? _appointment.Subject;
+        public string Title => _originalTitle ?? _event.Subject;
 
-        public DateTime Start => _appointment.Start;
-        public DateTime End => _appointment.End;
+        public DateTime Start => _event.Start.ToDateTime().ToLocalTime();
+        public DateTime End => _event.End.ToDateTime().ToLocalTime();
 
-        public bool AllDay => _appointment.IsAllDayEvent;
-        public bool Recurring => _appointment.IsRecurring;
+        public bool AllDay => _event.IsAllDay.GetValueOrDefault();
+        public bool Recurring => _event.Type != EventType.SingleInstance;
 
-        public long UnixTimestamp => new DateTimeOffset(_appointment.Start).ToUnixTimeMilliseconds();
-        public long DurationMillis => (long) _appointment.Duration.TotalMilliseconds;
+        public long UnixTimestamp => new DateTimeOffset(Start).ToUnixTimeMilliseconds();
+        public long DurationMillis => (long) End.Subtract(Start).TotalMilliseconds;
         public bool IsHidden => _originalTitle != null;
     }
 }

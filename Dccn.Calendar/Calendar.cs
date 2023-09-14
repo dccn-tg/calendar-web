@@ -1,52 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Exchange.WebServices.Data;
+using Microsoft.Graph;
+using Microsoft.Graph.Models;
 
 namespace Dccn.Calendar
 {
     public class Calendar
     {
-        private static readonly PropertySet AppointmentProperties =
-            new PropertySet(BasePropertySet.IdOnly,
-                ItemSchema.Subject,
-                AppointmentSchema.Start,
-                AppointmentSchema.End,
-                AppointmentSchema.IsAllDayEvent,
-                AppointmentSchema.IsRecurring,
-                AppointmentSchema.Duration,
-                AppointmentSchema.ICalUid);
+        private readonly Microsoft.Graph.Models.Calendar _folder;
 
-        private readonly CalendarFolder _folder;
-
-        internal Calendar(CalendarClient client, CalendarFolder folder)
+        internal Calendar(Microsoft.Graph.Models.Calendar folder, string mailBox)
         {
             _folder = folder;
-            Client = client;
+            MailBox = mailBox;
         }
 
-        public CalendarClient Client { get; }
+        public string Id => _folder.Id;
+        public string Name => _folder.Name;
+        public string MailBox { get; }
 
-        public string Id => _folder.Id.ToString();
-        public string Name => _folder.DisplayName;
-
-        public async Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, DateTime end)
+        public async Task<IEnumerable<Event>> EventsRangeAsync(CalendarClient client, string mailBox, DateTime start, DateTime end)
         {
-            var view = new CalendarView(start, end, Client.MaxEvents)
+            var response = await client.Client.Users[mailBox].Calendars[Id].CalendarView.GetAsync(request =>
             {
-                PropertySet = AppointmentProperties
-            };
-            var appointments = await _folder.FindAppointments(view);
+                request.QueryParameters.StartDateTime = start.ToString("o", CultureInfo.InvariantCulture);
+                request.QueryParameters.EndDateTime = end.ToString("o", CultureInfo.InvariantCulture);
+                request.QueryParameters.Select = new[]
+                {
+                    "id",
+                    "subject",
+                    "start",
+                    "end",
+                    "isAllDay",
+                    "type"
+                };
+                request.QueryParameters.Orderby = new[] {"start/dateTime"};
+                request.QueryParameters.Top = client.MaxEvents;
+            });
 
-            return appointments
-                .OrderBy(appointment => appointment.Start)
-                .Select(appointment => new Event(this, appointment));
+            return response!.Value!.Select(@event => new Event(@event, this));
         }
 
-        public Task<IEnumerable<Event>> EventsRangeAsync(DateTime start, TimeSpan duration)
+        public Task<IEnumerable<Event>> EventsRangeAsync(CalendarClient client, string mailBox, DateTime start, TimeSpan duration)
         {
-            return EventsRangeAsync(start, start.Add(duration));
+            return EventsRangeAsync(client, mailBox, start, start.Add(duration));
         }
     }
 }
