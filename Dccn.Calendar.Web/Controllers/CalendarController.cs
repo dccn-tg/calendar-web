@@ -27,19 +27,19 @@ namespace Dccn.Calendar.Web.Controllers
             DateTime start,
             DateTime end)
         {
-            var (success, calendar) = await _service.TryGetCalendarAsync(calendarId);
-            if (!success)
+            var calendar = await _service.TryGetCalendarAsync(calendarId);
+            if (calendar == null)
             {
                 return NotFound();
             }
 
-            var events = (await calendar.EventsRangeAsync(start, end))
+            var events = (await _service.GetEventsRangeAsync(calendar, start, end))
                 .Select(@event => new CalendarEvent
                 {
                     Id = @event.Id,
                     Title = @event.Title,
                     Start = @event.Start,
-                    End = @event.End,
+                    End = @event.End == @event.Start ? @event.End.AddMinutes(10) : @event.End,
                     AllDay = @event.AllDay,
                     Recurring = @event.Recurring,
                     Location = calendar.Location

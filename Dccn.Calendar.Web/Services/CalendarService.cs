@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dccn.Calendar.Web.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Dccn.Calendar.Web.Services
@@ -11,37 +11,34 @@ namespace Dccn.Calendar.Web.Services
     public class CalendarService : ICalendarService
     {
         private readonly CalendarOptions _options;
-        private readonly IDictionary<string, Calendar> _calendarCache;
-        private readonly IDictionary<string, CalendarClient> _clients;
+        private readonly CalendarClient _client;
+        private readonly IMemoryCache _calendarCache;
 
-        public CalendarService(IOptions<CalendarOptions> options)
+        public CalendarService(IOptions<CalendarOptions> options, IMemoryCache calendarCache)
         {
             _options = options.Value;
-            // Thread safety: because the service is scoped, it might have to process multiple requests in parallel.
-            // The cache needs to be able to deal with this.
-            // See https://blog.stephencleary.com/2017/03/aspnetcore-synchronization-context.html
-            _calendarCache = new ConcurrentDictionary<string, Calendar>(StringComparer.OrdinalIgnoreCase);
-            _clients = new ConcurrentDictionary<string, CalendarClient>(StringComparer.OrdinalIgnoreCase);
+            _client = new CalendarClient(_options.TenantId, _options.ClientId, _options.Certificate);
+            _calendarCache = calendarCache;
         }
 
-        public async Task<(bool Success, Calendar Calendar)> TryGetCalendarAsync(string calendarId)
+        public async Task<Calendar> TryGetCalendarAsync(string calendarId)
         {
             if (calendarId == null)
             {
-                return (false, null);
+                return null;
             }
 
-            if (_calendarCache.TryGetValue(calendarId, out var cachedCalendar))
+            if (_calendarCache.TryGetValue<Calendar>(calendarId, out var cachedCalendar))
             {
-                return (true, cachedCalendar);
+                return cachedCalendar;
             }
 
             if (!_options.Calendars.TryGetValue(calendarId, out var calendarOptions))
             {
-                return (false, null);
+                return null;
             }
 
-            return (true, await FetchCalendarAsync(calendarId, calendarOptions));
+            return await FetchCalendarAsync(calendarId, calendarOptions);
         }
 
         public async Task<IEnumerable<Calendar>> GetCalendarsAsync(bool overview)
@@ -54,44 +51,48 @@ namespace Dccn.Calendar.Web.Services
             return await Task.WhenAll(tasks);
         }
 
-        private async Task<Calendar> FetchCalendarAsync(string calendarId, CalendarOptions.Calendar calendarOptions)
+        public async Task<IEnumerable<Calendar.Event>> GetOverviewEventsAsync(DateTime? date)
         {
-            if (_calendarCache.TryGetValue(calendarId, out var calendar))
-            {
-                return calendar;
-            }
+            var calendars = (await GetCalendarsAsync(true)).ToList();
+            var start = date.GetValueOrDefault(DateTime.Today);
+            var end = start.AddDays(1).AddTicks(-1);
+            var events = await _client.GetEventsAsync(calendars.Select(calendar => calendar.Inner), start, end);
 
-            var sourceId = calendarOptions.Source;
-            if (!_clients.TryGetValue(sourceId, out var client))
-            {
-                var source = _options.Sources[sourceId];
-                client = new CalendarClient(source.ExchangeUrl, source.Username, source.Password);
+            return events.Select(@event => new Calendar.Event(@event, calendars.First(calendar => calendar.Inner == @event.Calendar)));
+        }
 
-                if (_options.MaxEvents.HasValue)
+        public async Task<IEnumerable<Calendar.Event>> GetEventsRangeAsync(Calendar calendar, DateTime start, DateTime end)
+        {
+            return await calendar.EventsRangeAsync(_client, start, end);
+        }
+
+        private Task<Calendar> FetchCalendarAsync(string calendarId, CalendarOptions.Calendar calendarOptions)
+        {
+            return _calendarCache.GetOrCreateAsync(calendarId, async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+
+                var calendar = new Calendar(
+                    await _client.GetCalendarByIdAsync(calendarOptions.MailBox, calendarOptions.ExchangeId));
+                if (calendarOptions.Name != null)
                 {
-                    client.MaxEvents = _options.MaxEvents.Value;
+                    calendar.Name = calendarOptions.Name;
                 }
 
-                _clients[sourceId] = client;
-            }
+                calendar.Id = calendarId;
+                calendar.Location = calendarOptions.Location;
+                calendar.OverrideEventTitle = calendarOptions.OverrideEventTitle;
 
-            calendar = new Calendar(await client.GetCalendarByIdAsync(calendarOptions.ExchangeId));
-            if (calendarOptions.Name != null)
-            {
-                calendar.Name = calendarOptions.Name;
-            }
-
-            calendar.Id = calendarId;
-            calendar.Location = calendarOptions.Location;
-
-            _calendarCache.Add(calendarId, calendar);
-            return calendar;
+                return calendar;
+            });
         }
     }
 
     public interface ICalendarService
     {
-        Task<(bool Success, Calendar Calendar)> TryGetCalendarAsync(string calendarId);
+        Task<Calendar> TryGetCalendarAsync(string calendarId);
         Task<IEnumerable<Calendar>> GetCalendarsAsync(bool overview = false);
+        Task<IEnumerable<Calendar.Event>> GetEventsRangeAsync(Calendar calendar, DateTime start, DateTime end);
+        Task<IEnumerable<Calendar.Event>> GetOverviewEventsAsync(DateTime? date);
     }
 }

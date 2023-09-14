@@ -5,7 +5,9 @@ services:
     image: docker-registry.dccn.nl:5000/calendar-web
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - CalendarService__Sources__dccn__Certificate=/mnt/dccn_cert.pfx
     ports:
       - "8080:80"
     volumes:
       - $APPDATA/Microsoft/UserSecrets/:/root/.microsoft/usersecrets/:ro
+      - $USERPROFILE/appreg0040.ru.nl.pfx:/mnt/dccn_cert.pfx:ro

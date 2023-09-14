@@ -29,7 +29,6 @@ jQuery(function($) {
                 return event;
             },
             eventRender: function(event, $elem) {
-                var div = "<div></div>";
                 var html = "<div>";
                 if (event.allDay) {
                     if (event.end.diff(event.start, "days") <= 1) {

@@ -36,21 +36,17 @@ namespace Dccn.Calendar.Web.Pages
             Date = date ?? DateTime.Today;
             var now = DateTime.Now;
 
-            var tasks = (await _service.GetCalendarsAsync(true))
-                .Select(async calendar => new {Calendar = calendar, Events = await calendar.EventsRangeAsync(Date, Duration)});
-
-            var events = (await Task.WhenAll(tasks))
-                .SelectMany(collection => collection.Events.Select(@event => new {collection.Calendar, Event = @event}))
-                .Where(eventInfo => !eventInfo.Event.IsHidden)
-                .OrderBy(eventInfo => eventInfo.Event.Start)
-                .ThenBy(eventInfo => eventInfo.Event.End)
-                .Select(eventInfo => new OverviewEvent
+            var events = (await _service.GetOverviewEventsAsync(Date))
+                .Where(@event => !@event.IsHidden)
+                .OrderBy(@event => @event.Start)
+                .ThenBy(@event => @event.End)
+                .Select(@event => new OverviewEvent
                 {
-                    Title = eventInfo.Event.Title,
-                    Start = eventInfo.Event.Start,
-                    End = eventInfo.Event.End,
-                    Location = eventInfo.Calendar.Location,
-                    Ended = now > eventInfo.Event.End
+                    Title = @event.Title,
+                    Start = @event.Start,
+                    End = @event.End,
+                    Location = @event.Calendar.Location,
+                    Ended = now > @event.End
                 })
                 .ToList();
 

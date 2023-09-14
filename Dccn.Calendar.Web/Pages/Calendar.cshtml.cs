@@ -21,14 +21,14 @@ namespace Dccn.Calendar.Web.Pages
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            var result = await _service.TryGetCalendarAsync(id);
-            if (!result.Success)
+            var calendar = await _service.TryGetCalendarAsync(id);
+            if (calendar == null)
             {
                 return NotFound();
             }
 
             Id = id;
-            Name = result.Calendar.Name;
+            Name = calendar.Name;
 
             return Page();
         }

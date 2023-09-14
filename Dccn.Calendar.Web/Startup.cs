@@ -3,9 +3,9 @@ using Dccn.Calendar.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Dccn.Calendar.Web
 {
@@ -20,13 +20,14 @@ namespace Dccn.Calendar.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMemoryCache();
+            services.AddRazorPages();
 
             services.AddScoped<ICalendarService, CalendarService>();
             services.Configure<CalendarOptions>(Configuration.GetSection("CalendarService"));
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.Use((context, next) =>
             {
@@ -53,7 +54,13 @@ namespace Dccn.Calendar.Web
 
             app.UseStatusCodePages();
             app.UseStaticFiles();
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapDefaultControllerRoute();
+            });
         }
     }
 }

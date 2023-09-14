@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -23,8 +22,8 @@ namespace Dccn.Calendar.Cli
                 .Build()
                 .Get<CalendarOptions>();
 
-            var client = new CalendarClient(options.ExchangeUrl, options.Username, options.Password);
-            var calendars = (await client.ListCalendarsAsync()).OrderBy(c => c.Name).ToList();
+            var client = new CalendarClient(options.TenantId, options.ClientId, options.Certificate);
+            var calendars = (await client.ListCalendarsAsync(options.UserId)).OrderBy(c => c.Name).ToList();
             using (var writer = new JsonTextWriter(Console.Out))
             {
                 writer.Formatting = Formatting.Indented;
@@ -69,8 +68,6 @@ namespace Dccn.Calendar.Cli
 
                 await writer.WriteEndObjectAsync();
             }
-
-            Console.ReadLine();
         }
     }
 }
